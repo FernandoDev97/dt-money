@@ -42,7 +42,7 @@ export function TransactionsProvider({ children }: TransactionsProviderProps) {
 
   useEffect(() => {
     getTransactions()
-  }, [])
+  }, [getTransactions])
 
   const createTransaction = useCallback(
     async (data: CreateTransactionProps) => {
