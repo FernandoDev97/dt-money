@@ -47,14 +47,6 @@
       "price": 299,
       "createdAt": "2023-07-12T02:02:46.188Z",
       "id": 6
-    },
-    {
-      "description": "Suco",
-      "type": "outcome",
-      "category": "Alimentação",
-      "price": 3,
-      "createdAt": "2023-07-12T02:23:04.866Z",
-      "id": 7
     }
   ]
 }
