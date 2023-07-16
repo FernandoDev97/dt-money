@@ -12,6 +12,7 @@ import { Controller, useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { TransactionsContext } from '../../contexts/TransactionsContext'
 import { useContextSelector } from 'use-context-selector'
+import { api } from '../../lib/axios'
 
 const newTransactionsFormSchema = z.object({
   description: z.string(),
@@ -22,13 +23,25 @@ const newTransactionsFormSchema = z.object({
 
 type NewTransactionsFormInputs = z.infer<typeof newTransactionsFormSchema>
 
-export function NewTransactionModal() {
+interface NewTransactionModalProps {
+  variant?: 'update' | 'create'
+  transactionId?: number | null
+}
+
+export function TransactionModal({
+  variant,
+  transactionId,
+}: NewTransactionModalProps) {
   const createTransaction = useContextSelector(
     TransactionsContext,
     (context) => {
       return context.createTransaction
     },
   )
+
+  const setTransactions = useContextSelector(TransactionsContext, (context) => {
+    return context.setTransactions
+  })
 
   const {
     control,
@@ -45,6 +58,21 @@ export function NewTransactionModal() {
     reset()
   }
 
+  async function handleUpdateTransaction(dataUp: NewTransactionsFormInputs) {
+    const { category, description, price, type } = dataUp
+    const { data } = await api.put(`transactions/${transactionId}`, {
+      description,
+      type,
+      category,
+      price,
+      createdAt: new Date(),
+    })
+    if (data.id === transactionId) {
+      setTransactions((state) => [data, ...state])
+    }
+    window.location.reload()
+  }
+
   return (
     <Dialog.Portal>
       <Overlay />
@@ -53,7 +81,13 @@ export function NewTransactionModal() {
         <CloseButton>
           <X size={24} />
         </CloseButton>
-        <form onSubmit={handleSubmit(handleNewTransaction)}>
+        <form
+          onSubmit={handleSubmit(
+            variant === 'create'
+              ? handleNewTransaction
+              : handleUpdateTransaction,
+          )}
+        >
           <input
             type="text"
             placeholder="Descrição"
@@ -93,9 +127,16 @@ export function NewTransactionModal() {
               )
             }}
           />
-          <button type="submit" disabled={isSubmitting}>
-            Cadastrar
-          </button>
+          {variant === 'create' && (
+            <button type="submit" disabled={isSubmitting}>
+              Cadastrar
+            </button>
+          )}
+          {variant === 'update' && (
+            <button type="submit" disabled={isSubmitting}>
+              Atualizar
+            </button>
+          )}
         </form>
       </Content>
     </Dialog.Portal>

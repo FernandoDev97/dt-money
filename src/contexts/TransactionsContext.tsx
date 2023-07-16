@@ -1,4 +1,10 @@
-import { ReactNode, useCallback, useEffect, useState } from 'react'
+import React, {
+  ReactNode,
+  useCallback,
+  useEffect,
+  useState,
+  SetStateAction,
+} from 'react'
 import { api } from '../lib/axios'
 import { createContext } from 'use-context-selector'
 
@@ -22,6 +28,7 @@ interface TransactionsContextType {
   transactions: TransactionsProps[]
   getTransactions: (query?: string) => Promise<void>
   createTransaction: (data: CreateTransactionProps) => Promise<void>
+  setTransactions: React.Dispatch<SetStateAction<TransactionsProps[]>>
 }
 
 interface TransactionsProviderProps {
@@ -58,9 +65,15 @@ export function TransactionsProvider({ children }: TransactionsProviderProps) {
     },
     [],
   )
+
   return (
     <TransactionsContext.Provider
-      value={{ transactions, getTransactions, createTransaction }}
+      value={{
+        transactions,
+        getTransactions,
+        createTransaction,
+        setTransactions,
+      }}
     >
       {children}
     </TransactionsContext.Provider>
